@@ -49,6 +49,27 @@ public class Entregador extends EntidadeAuditavel {
     private Double valorFrete;
 
     @Column
+    private String rua;
+
+    @Column
+    private String numero;
+
+    @Column
+    private String bairro;
+
+    @Column
+    private String cidade;
+
+    @Column
+    private String cep;
+
+    @Column
+    private String uf;
+
+    @Column
+    private String complemento;
+
+    @Column
     private Boolean ativo;
 
 }

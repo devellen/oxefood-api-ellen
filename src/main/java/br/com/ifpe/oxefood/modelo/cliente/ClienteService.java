@@ -48,4 +48,13 @@ public class ClienteService {
         repository.save(cliente);
     }
 
+    public void delete(Long id) {
+
+        Cliente cliente = repository.findById(id).get();
+        cliente.setHabilitado(Boolean.FALSE); //desabilita cliente
+        cliente.setVersao(cliente.getVersao() + 1);
+
+        repository.save(cliente);
+    }
+
 }
