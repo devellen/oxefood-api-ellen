@@ -27,7 +27,7 @@ public class Entregador extends EntidadeAuditavel {
     @Column //cria uma coluna com o atributo
     private String nome;
 
-    @Column
+    @Column(unique = true)
     private String cpf;
 
     @Column

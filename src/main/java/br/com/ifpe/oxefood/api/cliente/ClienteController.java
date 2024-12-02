@@ -30,7 +30,7 @@ public class ClienteController {
     private ClienteService clienteService;
 
     @PostMapping // rota de cadastro
-    public ResponseEntity<Cliente> save(@RequestBody ClienteRequest request) { // o parametro vai ser preenchido via
+    public ResponseEntity<Cliente> save(@RequestBody @Valid ClienteRequest request) { // o parametro vai ser preenchido via
                                                                                // json
 
         Cliente cliente = clienteService.save(request.build()); // cria o objeto para o cliente request
@@ -48,7 +48,7 @@ public class ClienteController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Cliente> update(@PathVariable("id") Long id, @RequestBody ClienteRequest request) {
+    public ResponseEntity<Cliente> update(@PathVariable("id") Long id, @RequestBody @Valid ClienteRequest request) {
 
         clienteService.update(id, request.build());
         return ResponseEntity.ok().build();
@@ -68,6 +68,12 @@ public class ClienteController {
 
         EnderecoCliente endereco = clienteService.adicionarEnderecoCliente(clienteId, request.build());
         return new ResponseEntity<EnderecoCliente>(endereco, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/{clienteId}/enderecos")
+    public ResponseEntity<List<EnderecoCliente>> listarEnderecosCliente(@PathVariable("clienteId") Long clienteId) {
+        List<EnderecoCliente> enderecos = clienteService.listarEnderecosCliente(clienteId);
+        return ResponseEntity.ok(enderecos);
     }
 
     @PutMapping("/endereco/{enderecoId}")

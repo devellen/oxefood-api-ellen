@@ -2,9 +2,12 @@ package br.com.ifpe.oxefood.api.entregador;
 
 import java.time.LocalDate;
 
+import org.hibernate.validator.constraints.br.CPF;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import br.com.ifpe.oxefood.modelo.entregador.Entregador;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +20,8 @@ import lombok.NoArgsConstructor;
 public class EntregadorRequest { // cria uma coluna com o atributo
     private String nome;
 
+    @NotBlank(message = "O CPF é de preenchimento obrigatório") // verifica se é nulo ou vazio
+    @CPF
     private String cpf;
 
     private String rg;
@@ -50,22 +55,22 @@ public class EntregadorRequest { // cria uma coluna com o atributo
 
     public Entregador build() {
         return Entregador.builder()
-            .nome(nome)
-            .cpf(cpf)
-            .rg(rg)
-            .dataNascimento(dataNascimento)
-            .foneCelular(foneCelular)
-            .foneFixo(foneFixo)
-            .qtdEntregasRealizadas(qtdEntregasRealizadas)
-            .valorFrete(valorFrete)
-            .rua(rua)
-            .numero(numero)
-            .bairro(bairro)
-            .cidade(cidade)
-            .cep(cep)
-            .uf(uf)
-            .complemento(complemento)
-            .ativo(ativo)
-            .build();
+                .nome(nome)
+                .cpf(cpf)
+                .rg(rg)
+                .dataNascimento(dataNascimento)
+                .foneCelular(foneCelular)
+                .foneFixo(foneFixo)
+                .qtdEntregasRealizadas(qtdEntregasRealizadas)
+                .valorFrete(valorFrete)
+                .rua(rua)
+                .numero(numero)
+                .bairro(bairro)
+                .cidade(cidade)
+                .cep(cep)
+                .uf(uf)
+                .complemento(complemento)
+                .ativo(ativo)
+                .build();
     }
 }

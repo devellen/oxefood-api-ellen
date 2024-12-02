@@ -7,10 +7,19 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.com.ifpe.oxefood.util.exception.ClienteException;
 import jakarta.transaction.Transactional;
 
 @Service
 public class ClienteService {
+
+    private boolean validarDDD(String foneCelular) {
+        // Extrai os dois primeiros dígitos do telefone
+        String ddd = foneCelular.substring(1, 3);
+        // Verifica se o DDD é "81" (ou adicione outros válidos)
+        return ddd.equals("81");
+    }
+
     @Autowired
     private ClienteRepository repository;
 
@@ -19,6 +28,10 @@ public class ClienteService {
 
     @Transactional
     public Cliente save(Cliente cliente) { // a função da classe é a save
+
+        if (!validarDDD(cliente.getFoneCelular())) {
+            throw new ClienteException(ClienteException.MSG_DDD_81);
+        }
 
         // salva os dados que vem preenchidos pelo cliente. mas tb vem esses valores
         // preencidos por default (definido na regra do negocio)
@@ -87,6 +100,11 @@ public class ClienteService {
         repository.save(cliente);
 
         return endereco;
+    }
+
+    public List<EnderecoCliente> listarEnderecosCliente(Long clienteId) {
+        Cliente cliente = obterPorID(clienteId); // Certifique-se de que este método já busca o cliente pelo ID
+        return cliente.getEnderecos(); // Assumindo que o Cliente tem uma lista de endereços mapeada.
     }
 
     @Transactional

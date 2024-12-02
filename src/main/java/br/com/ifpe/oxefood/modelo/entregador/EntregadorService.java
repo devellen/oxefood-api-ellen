@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.com.ifpe.oxefood.util.exception.EntregadorException;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -15,6 +16,10 @@ public class EntregadorService {
 
     @Transactional
     public Entregador save(Entregador entregador) {
+        if (entregador.getValorFrete() < 10) {
+            throw new EntregadorException(EntregadorException.MSG_VALOR_MINIMO_FRETE);
+        }
+
         entregador.setHabilitado(Boolean.TRUE);
         entregador.setVersao(1L);
         entregador.setDataCriacao(LocalDate.now());

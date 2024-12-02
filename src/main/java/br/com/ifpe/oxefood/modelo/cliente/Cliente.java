@@ -31,13 +31,13 @@ public class Cliente extends EntidadeAuditavel {
     @OneToMany(mappedBy = "cliente", orphanRemoval = true, fetch = FetchType.EAGER)
     private List<EnderecoCliente> enderecos;
 
-    @Column // cria uma coluna com o atributo
+    @Column(nullable = false, length = 100) // cria uma coluna com o atributo
     private String nome;
 
     @Column
     private LocalDate dataNascimento;
 
-    @Column
+    @Column(unique = true)
     private String cpf;
 
     @Column
