@@ -15,10 +15,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.ifpe.oxefood.modelo.acesso.UsuarioService;
 import br.com.ifpe.oxefood.modelo.cliente.Cliente;
 import br.com.ifpe.oxefood.modelo.cliente.ClienteService;
 import br.com.ifpe.oxefood.modelo.cliente.EnderecoCliente;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+
+import io.swagger.v3.oas.annotations.Operation;
 
 @RestController // é uma api rest
 @RequestMapping("/api/cliente") // rota da classe
@@ -29,28 +33,35 @@ public class ClienteController {
     @Autowired // instacia o objeto e coloca na função
     private ClienteService clienteService;
 
-    @PostMapping // rota de cadastro
-    public ResponseEntity<Cliente> save(@RequestBody @Valid ClienteRequest request) { // o parametro vai ser preenchido via
-                                                                               // json
+    @Autowired
+    private UsuarioService usuarioService;
 
-        Cliente cliente = clienteService.save(request.build()); // cria o objeto para o cliente request
+    @Operation(summary = "Serviço responsável por salvar um cliente no sistema.", description = "Exemplo de descrição de um endpoint responsável por inserir um cliente no sistema.")
+    @PostMapping // rota de cadastro
+    public ResponseEntity<Cliente> save(@RequestBody @Valid ClienteRequest clienteRequest, HttpServletRequest request){ // o parametro vai ser preenchido
+                                                                                      // via
+        // json
+
+        Cliente cliente = clienteService.save(clienteRequest.build(), usuarioService.obterUsuarioLogado(request)); // cria o objeto para o cliente request
         return new ResponseEntity<Cliente>(cliente, HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Serviço responsável por listar todos os clientes no sistema.", description = "Exemplo de descrição de um endpoint responsável por listar todos os clientes no sistema.")
     @GetMapping
     public List<Cliente> listarTodos() {
         return clienteService.listarTodos();
     }
 
+    @Operation(summary = "Serviço responsável por listar o cliente por ID no sistema.", description = "Exemplo de descrição de um endpoint responsável por listar um cliente no sistema.")
     @GetMapping("/{id}")
     public Cliente obterPorID(@PathVariable Long id) { // o parametro vai ser preenchido via url
         return clienteService.obterPorID(id);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Cliente> update(@PathVariable("id") Long id, @RequestBody @Valid ClienteRequest request) {
+    public ResponseEntity<Cliente> update(@PathVariable("id") Long id, @RequestBody ClienteRequest clienteRequest, HttpServletRequest request) {
 
-        clienteService.update(id, request.build());
+        clienteService.update(id, clienteRequest.build(), usuarioService.obterUsuarioLogado(request));
         return ResponseEntity.ok().build();
     }
 

@@ -7,6 +7,11 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.com.ifpe.oxefood.modelo.acesso.Perfil;
+import br.com.ifpe.oxefood.modelo.acesso.PerfilRepository;
+import br.com.ifpe.oxefood.modelo.acesso.Usuario;
+import br.com.ifpe.oxefood.modelo.acesso.UsuarioService;
+import br.com.ifpe.oxefood.modelo.mensagens.EmailService;
 import br.com.ifpe.oxefood.util.exception.ClienteException;
 import jakarta.transaction.Transactional;
 
@@ -26,19 +31,41 @@ public class ClienteService {
     @Autowired
     private EnderecoClienteRepository enderecoClienteRepository;
 
+    @Autowired
+    private UsuarioService usuarioService;
+
+    @Autowired
+    private PerfilRepository perfilUsuarioRepository; 
+
+    @Autowired
+    private EmailService emailService;
+
     @Transactional
-    public Cliente save(Cliente cliente) { // a função da classe é a save
+    public Cliente save(Cliente cliente, Usuario usuarioLogado) { // a função da classe é a save
 
         if (!validarDDD(cliente.getFoneCelular())) {
             throw new ClienteException(ClienteException.MSG_DDD_81);
         }
+
+        usuarioService.save(cliente.getUsuario()); // antes de salvar cliente, salva usuario
+
+        for (Perfil perfil : cliente.getUsuario().getRoles()) {
+           perfil.setHabilitado(Boolean.TRUE);
+           cliente.setCriadoPor(usuarioLogado);
+           perfilUsuarioRepository.save(perfil);
+      }
+
 
         // salva os dados que vem preenchidos pelo cliente. mas tb vem esses valores
         // preencidos por default (definido na regra do negocio)
         cliente.setHabilitado(Boolean.TRUE);
         cliente.setVersao(1L);
         cliente.setDataCriacao(LocalDate.now());
-        return repository.save(cliente); // grava o registro no banco
+        Cliente clienteSalvo = repository.save(cliente);
+        emailService.enviarEmailConfirmacaoCadastroCliente(clienteSalvo);
+
+        return clienteSalvo;
+
     }
 
     public List<Cliente> listarTodos() {
@@ -52,7 +79,7 @@ public class ClienteService {
     }
 
     @Transactional
-    public void update(Long id, Cliente clienteAlterado) {
+    public void update(Long id, Cliente clienteAlterado, Usuario usuarioLogado) {
 
         Cliente cliente = repository.findById(id).get();
         cliente.setNome(clienteAlterado.getNome());
@@ -62,6 +89,8 @@ public class ClienteService {
         cliente.setFoneFixo(clienteAlterado.getFoneFixo());
 
         cliente.setVersao(cliente.getVersao() + 1);
+
+        cliente.setUltimaModificacaoPor(usuarioLogado);
         repository.save(cliente);
     }
 
